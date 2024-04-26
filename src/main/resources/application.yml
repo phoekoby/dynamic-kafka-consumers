@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: dynamic-kafka-consumers
+
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: converter
+      auto-offset-reset: earliest
+
