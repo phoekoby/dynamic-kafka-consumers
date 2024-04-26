@@ -1,21 +1,19 @@
 package com.example.dynamickafkaconsumers.bfpp;
 
 import com.example.dynamickafkaconsumers.annotations.KafkaConverter;
-import com.example.dynamickafkaconsumers.function.DefaultKafkaConverterProcessor;
 import com.example.dynamickafkaconsumers.pojo.KafkaConsumerConfig;
 import com.example.dynamickafkaconsumers.pojo.KafkaConsumerPojo;
-import com.example.dynamickafkaconsumers.service.NegativesService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.support.*;
-import org.springframework.core.ResolvableType;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,32 +32,8 @@ public class KafkaConsumerBeanDefinitionRegistryPostProcessor implements BeanDef
                 Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
 
                 if (beanClass.isAnnotationPresent(KafkaConverter.class)) {
-                    Class<?> converterBeanClass = beanClass;
                     KafkaConverter annotation = beanClass.getAnnotation(KafkaConverter.class);
-
-                    String processorBeanName = annotation.kafkaConverterProcessorBeanName();
-
-                    if (ObjectUtils.isEmpty(processorBeanName)) {
-                        processorBeanName = annotation.id() + "Processor";
-
-                        RootBeanDefinition processorBeanDefinition = new RootBeanDefinition(DefaultKafkaConverterProcessor.class);
-                        processorBeanDefinition.setTargetType(ResolvableType.forClassWithGenerics(
-                                DefaultKafkaConverterProcessor.class,
-                                annotation.keyClass(),
-                                annotation.valueClass()
-                        ));
-                        processorBeanDefinition.getConstructorArgumentValues()
-                                .addIndexedArgumentValue(0, new RuntimeBeanReference(NegativesService.class));
-                        processorBeanDefinition.getConstructorArgumentValues()
-                                .addIndexedArgumentValue(1, new RuntimeBeanReference(converterBeanClass));
-
-                        registry.registerBeanDefinition(processorBeanName, processorBeanDefinition);
-                    }
-
-
-                    registerConsumerBeanDefinition(registry, annotation, processorBeanName);
-                } else {
-                    log.warn(String.format("Bean %s не будет использоваться без указания Аннотации %s", beanDefinitionName, KafkaConverter.class.getName()));
+                    registerConsumerBeanDefinition(registry, annotation, beanDefinitionName);
                 }
             }
 
@@ -73,6 +47,7 @@ public class KafkaConsumerBeanDefinitionRegistryPostProcessor implements BeanDef
             String processorBeanName
 
     ) {
+        log.info("==================== Регистрируем Consumer Bean Definition ====================");
         String consumerBeanName = annotation.id() + "KafkaConsumer";
 
         AbstractBeanDefinition consumer = BeanDefinitionBuilder
@@ -94,8 +69,7 @@ public class KafkaConsumerBeanDefinitionRegistryPostProcessor implements BeanDef
             Class<K> kClass,
             Class<V> vClass
     ) {
-//        log.info("========== Начинаю создавать Kafka Consumer для {} ==========", converterBeanClass.getName());
-
+        log.info("==================== Конфигурация Kafka Consumer ====================");
         List<String> consumerProperties = Arrays.stream(annotation.properties()).collect(Collectors.toList());
         consumerProperties.add(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG + "=" + annotation.keyDeserializer().getName());
         consumerProperties.add(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG + "=" + annotation.valueDeserializer().getName());
@@ -130,7 +104,5 @@ public class KafkaConsumerBeanDefinitionRegistryPostProcessor implements BeanDef
                 annotation.info(),
                 annotation.containerPostProcessor()
         );
-
-
     }
 }

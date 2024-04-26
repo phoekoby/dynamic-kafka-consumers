@@ -1,6 +1,9 @@
 package com.example.dynamickafkaconsumers.processor;
 
+import com.example.dynamickafkaconsumers.service.BusinessLogicService;
+
 public abstract class DefaultKafkaMessageProcessor<K, V, E> implements KafkaMessageProcessor<K, V> {
+    protected abstract BusinessLogicService<E> getService();
     protected abstract Boolean check(K key, V value);
 
     protected abstract E convert(K key, V value);
@@ -14,5 +17,7 @@ public abstract class DefaultKafkaMessageProcessor<K, V, E> implements KafkaMess
         }
     }
 
-    protected abstract void doBusinessLogic(E e);
+    protected void doBusinessLogic(E e){
+        getService().doBusinessLogic(e);
+    }
 }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
         topics = "employee",
         groupId = "kafka",
         keyClass = String.class,
-        valueClass = Employee.class
+        valueClass = Human.class
 )
 @RequiredArgsConstructor
 public class EmployeeKafkaMessageConverter extends BaseEntityDefaultKafkaMessageProcessor<String, Human> {
@@ -32,6 +32,7 @@ public class EmployeeKafkaMessageConverter extends BaseEntityDefaultKafkaMessage
         System.out.println("EmployeeKafkaMessageConverter convert: " + key + " " + value);
         return new BaseEntity();
     }
+
 
     @Override
     protected NegativesService getService() {
