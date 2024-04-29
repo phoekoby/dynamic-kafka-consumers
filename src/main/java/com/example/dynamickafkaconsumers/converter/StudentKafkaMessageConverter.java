@@ -28,7 +28,7 @@ public class StudentKafkaMessageConverter extends BaseEntityDefaultKafkaMessageP
     }
 
     @Override
-    public BaseEntity convert(String key, Student value) {
+    public BaseEntity convertInbound(String key, Student value) {
         System.out.println("CONVERT: " + key + " " + value);
         return new BaseEntity();
     }

@@ -8,13 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-public class NegativesService implements BusinessLogicService<BaseEntity>{
+public class NegativesService implements BusinessLogicService<BaseEntity, BaseEntity>{
 
     @AopAnnotation
     @Transactional
     @Override
-    public void doBusinessLogic(BaseEntity entity) {
+    public BaseEntity doBusinessLogic(BaseEntity entity) {
         log.info("NegativesService process---");
         System.out.println(entity);
+        return entity;
     }
 }

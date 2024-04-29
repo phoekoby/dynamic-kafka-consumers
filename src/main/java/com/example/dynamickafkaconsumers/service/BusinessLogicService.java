@@ -1,5 +1,5 @@
 package com.example.dynamickafkaconsumers.service;
 
-public interface BusinessLogicService<E> {
-    void doBusinessLogic(E e);
+public interface BusinessLogicService<E, P> {
+    P doBusinessLogic(E e);
 }

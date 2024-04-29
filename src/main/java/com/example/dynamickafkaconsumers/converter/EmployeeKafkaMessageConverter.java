@@ -28,7 +28,7 @@ public class EmployeeKafkaMessageConverter extends BaseEntityDefaultKafkaMessage
     }
 
     @Override
-    public BaseEntity convert(String key, Human value) {
+    public BaseEntity convertInbound(String key, Human value) {
         System.out.println("EmployeeKafkaMessageConverter convert: " + key + " " + value);
         return new BaseEntity();
     }

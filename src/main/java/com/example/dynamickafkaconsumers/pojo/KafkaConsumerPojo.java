@@ -29,6 +29,6 @@ public record KafkaConsumerPojo<K, V>(
             info = "#{__listener.config.info}"
     )
     public void listen(ConsumerRecord<K, V> record) {
-        processor.process(record.key(), record.value());
+        processor.process(record);
     }
 }
